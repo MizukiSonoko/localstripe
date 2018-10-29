@@ -529,7 +529,6 @@ class Customer(StripeObject):
 
     @classmethod
     def _api_get_cards(cls, id, cid, source=None, **kwargs):
-        print(id,cid,source,kwargs)
         if kwargs:
             raise UserError(400, 'Unexpected ' + ', '.join(kwargs.keys()))
 
@@ -538,7 +537,6 @@ class Customer(StripeObject):
         if type(obj.default_source) is str and obj.default_source.startswith('card_'):
             source_obj = Card._api_retrieve(obj.default_source)
             source_obj.customer = id
-            print(vars(source_obj))
         return source_obj
 
 
