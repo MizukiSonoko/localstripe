@@ -238,6 +238,8 @@ def api_extra(func, url):
         data.update(unflatten_data(request.query) or {})
         if 'id' in request.match_info:
             data['id'] = request.match_info['id']
+        if 'cid' in request.match_info:
+            data['cid'] = request.match_info['cid']
         return json_response(func(**data)._export())
     return f
 

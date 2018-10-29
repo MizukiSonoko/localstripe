@@ -527,12 +527,30 @@ class Customer(StripeObject):
 
         return source_obj
 
+    @classmethod
+    def _api_get_cards(cls, id, cid, source=None, **kwargs):
+        print(id,cid,source,kwargs)
+        if kwargs:
+            raise UserError(400, 'Unexpected ' + ', '.join(kwargs.keys()))
+
+        obj = cls._api_retrieve(id)
+        source_obj = None
+        if type(obj.default_source) is str and obj.default_source.startswith('card_'):
+            source_obj = Card._api_retrieve(obj.default_source)
+            source_obj.customer = id
+            print(vars(source_obj))
+        return source_obj
+
 
 extra_apis.append(
     ('POST', '/v1/customers/{id}/sources', Customer._api_add_source))
 
 extra_apis.append(  # this is the old API route:
     ('POST', '/v1/customers/{id}/cards', Customer._api_add_source))
+
+# To get mock card information
+extra_apis.append(
+    ('GET', '/v1/customers/{id}/sources/{cid}', Customer._api_get_cards))
 
 
 class Event(StripeObject):
