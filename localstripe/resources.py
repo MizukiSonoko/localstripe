@@ -217,6 +217,7 @@ class StripeObject(object):
         return obj
 
 
+
 class Card(StripeObject):
     object = 'card'
     _id_prefix = 'card_'
@@ -247,6 +248,8 @@ class Card(StripeObject):
                 exp_year += 2000
             assert exp_year >= 2017 and exp_year <= 2100
             assert type(cvc) is str and len(cvc) == 3
+
+            assert self._validate_card(number)
         except AssertionError:
             raise UserError(400, 'Bad request')
 
@@ -282,6 +285,26 @@ class Card(StripeObject):
     def last4(self):
         return self._number[-4:]
 
+    @staticmethod
+    def _validate_card(number):
+        sum = 0
+        alternate = False
+        numberLen = len(number)
+
+        if numberLen < 13 or numberLen > 19:
+            return False
+
+        for i in range(numberLen-1, -1, -1):
+            mod = number[i]
+            if alternate:
+               mod *= 2
+               if mod > 9:
+                   mod = (mod % 10) + 1
+
+            alternate = not alternate
+            sum += mod
+
+        return sum % 10 == 0
 
 class Charge(StripeObject):
     object = 'charge'
